@@ -1,4 +1,5 @@
-﻿using Dominio;
+﻿using System;
+using Dominio;
 
 namespace Obligatorio
 {
@@ -8,159 +9,233 @@ namespace Obligatorio
 
         static void Main(string[] args)
         {
-            sistema = new Sistema();
+            sistema = Sistema.Instancia;
+
             string opcion = "";
             while (opcion != "5")
             {
-                mostrarMenu();
+                MostrarMenu();
+                Console.Write("Ingrese una opción: ");
                 opcion = Console.ReadLine();
+                Console.WriteLine();
+
                 switch (opcion)
                 {
                     case "1":
-                        {
-                            Console.Clear();
-                            //Listado de todos los usuarios. Se va a mostrar nombre, mail y grupo.
-                            Console.WriteLine("Listado de usuarios");
-                            Console.WriteLine("");
-                            sistema.MostrarListadoDeUsuarios();
-                            Console.WriteLine("");
-                        }
+                        ListarUsuarios();
                         break;
 
                     case "2":
-                        {
-                            Console.Clear();
-                            Console.WriteLine("Ingrese el email del usuario:");
-                            string email = Console.ReadLine();
-
-                            //Validar que el email no sea nulo o vacío
-
-                            if (string.IsNullOrEmpty(email))
-                            {
-                                Console.WriteLine("El email no puede estar vacío.");
-                                return;
-                            }
-                            //Si todo es correcto on la variable email llamamos al metodo MostrarPagosPorEmail
-                            sistema.MostrarPagosPorEmail(email);
-                        }
+                        ListarPagosPorUsuario();
                         break;
 
                     case "3":
-                        {
-                            Console.Clear();
-                            //Alta de usuario.
-
-                            Console.WriteLine("Nombre");
-                            string Nombre = Console.ReadLine();
-                            Console.WriteLine("Apellido");
-                            string Apellido = Console.ReadLine();
-
-                            //Validar que el nombre y apellido no sean nulos o vacíos
-
-                            if (string.IsNullOrEmpty(Nombre) || string.IsNullOrEmpty(Apellido))
-                            {
-                                Console.WriteLine("El nombre y/o el apellido no pueden estar vacíos. Intente nuevamente.");
-                                return;
-                            }
-
-                            //Contraseña
-
-                            Console.WriteLine("Contraseña");
-                            string Contrasenia = Console.ReadLine();
-
-                            //Validar que la contraseña tenga al menos 8 caracteres y no sea nula o vacía
-
-                            if (Contrasenia.Length < 8 || string.IsNullOrEmpty(Contrasenia))
-                            {
-                                Console.WriteLine("La contraseña debe tener al menos 8 caracteres. Intente nuevamente.");
-                                return;
-                            }
-
-                            //Equipos
-
-                            Console.WriteLine("Equipos");
-
-                            //Recorrer la lista de equipos y mostrar sus nombres con un número para seleccionar
-                            for (int i = 0; i < sistema.Equipos.Count; i++)
-                            {
-                                Console.WriteLine($"{i + 1}. {sistema.Equipos[i].NombreEquipo}");
-                            }
-                            Console.WriteLine("Seleccione el numero del equipo");
-
-                            //Seleccionar equipo por número
-                            int indice;
-                            //Validar que el número nos sirva
-                            while (!int.TryParse(Console.ReadLine(), out indice) || indice < 1 || indice > sistema.Equipos.Count)
-                            {
-                                Console.WriteLine("Número inválido. Intente nuevamente:");
-                            }
-
-                            Equipo equipoSeleccionado = sistema.Equipos[indice - 1];
-
-                            //Fecha de Incorporacion
-                            Console.WriteLine("Fecha de incorporación (dd/mm/aaaa):");
-                            DateTime FechaIncorporacion;
-                            while (!DateTime.TryParse(Console.ReadLine(), out FechaIncorporacion))
-                            {
-                                Console.WriteLine("Formato incorrecto. Ingrese la fecha nuevamente (dd/mm/aaaa):");
-                            }
-                            //Creamos el usuario
-                            sistema.CrearUsuario(Nombre, Apellido, Contrasenia, equipoSeleccionado, FechaIncorporacion);
-                        }
+                        AltaUsuario();
                         break;
 
                     case "4":
-                        {
-                            Console.Clear();
-                            //Mostrar usuarios de un equipo
-                            Console.WriteLine("Equipos");
-
-                            //Recorrer la lista de equipos y mostrar sus nombres con un número para seleccionar
-                            for (int i = 0; i < sistema.Equipos.Count; i++)
-                            {
-                                Console.WriteLine($"{i + 1}. {sistema.Equipos[i].NombreEquipo}");
-                            }
-                            Console.WriteLine("Seleccione el numero del equipo");
-                            int indice;
-                            //Validar que el número nos sirva
-                            while (!int.TryParse(Console.ReadLine(), out indice) || indice < 1 || indice > sistema.Equipos.Count)
-                            {
-                                Console.WriteLine("Número inválido. Intente nuevamente:");
-                            }
-                            //En base al indice elegido mostramos los usuarios del equipo
-                            sistema.MostrarUsuariosDeEquipo(indice);
-                            Console.WriteLine("");
-                        }
+                        MostrarUsuariosPorEquipo();
                         break;
 
                     case "5":
-                        {
-                            Console.Clear();
-                            Console.WriteLine("Cerrando programa...");
-                        }
+                        Console.WriteLine("Cerrando programa...");
                         break;
 
                     default:
-                        {
-                            Console.Clear();
-                            Console.WriteLine("Seleccione una opcion valida");
-                            Console.WriteLine("");
-                        }
+                        Console.WriteLine("Opción inválida. Intente nuevamente.\n");
                         break;
                 }
 
-                static void mostrarMenu()
+                if (opcion != "5")
                 {
-                    Console.WriteLine("MENU DE GESTION DE GASTOS");
-                    Console.WriteLine(" ");
-                    Console.WriteLine("1 - Listar Todos Los Usuarios");
-                    Console.WriteLine("2 - Listar Pagos De Un Usuario");
-                    Console.WriteLine("3 - Crear Usuario");
-                    Console.WriteLine("4 - Mostrar Listado De Un Equipo");
-                    Console.WriteLine("5 - Cerrar Programa");
+                    Console.WriteLine("\nPresione una tecla para continuar...");
+                    Console.ReadKey();
+                    Console.Clear();
                 }
             }
         }
+
+        private static void MostrarMenu()
+        {
+            Console.WriteLine("MENU DE GESTION DE GASTOS");
+            Console.WriteLine("-------------------------");
+            Console.WriteLine("1 - Listar todos los usuarios");
+            Console.WriteLine("2 - Listar pagos de un usuario");
+            Console.WriteLine("3 - Crear usuario");
+            Console.WriteLine("4 - Mostrar listado de un equipo");
+            Console.WriteLine("5 - Cerrar programa");
+            Console.WriteLine();
+        }
+
+        private static void ListarUsuarios()
+        {
+            Console.WriteLine("Listado de usuarios\n");
+
+            if (sistema.Usuarios.Count == 0)
+            {
+                Console.WriteLine("No hay usuarios registrados.");
+                return;
+            }
+
+            foreach (Usuario usuario in sistema.Usuarios)
+            {
+                Console.WriteLine($"Nombre: {usuario.Nombre} {usuario.Apellido} | Email: {usuario.Email} | Equipo: {usuario.Equipo.NombreEquipo}");
+            }
+
+            Console.WriteLine();
+        }
+
+        private static void ListarPagosPorUsuario()
+        {
+            Console.Write("Ingrese el email del usuario: ");
+            string email = Console.ReadLine();
+
+            if (string.IsNullOrWhiteSpace(email))
+            {
+                Console.WriteLine("El email no puede estar vacío.");
+                return;
+            }
+
+            Console.WriteLine($"\nPagos realizados por: {email}");
+            Console.WriteLine("-----------------------------------------------------");
+
+            bool encontro = false;
+
+            foreach (Pago p in sistema.Pagos)
+            {
+                if (p.UsuarioQueRealizo != null &&
+                    p.UsuarioQueRealizo.Email.Equals(email, StringComparison.OrdinalIgnoreCase))
+                {
+                    encontro = true;
+
+                    string tipo = p is Recurrente ? "Recurrente" : "Único";
+
+                    Console.WriteLine($"ID Pago: {p.Id}");
+                    Console.WriteLine($"Descripción: {p.Descripcion}");
+                    Console.WriteLine($"Método de pago: {p.MetodoDePago}");
+                    Console.WriteLine($"Tipo: {tipo}");
+
+                    if (p is Unico u)
+                    {
+                        double total = u.CalcularMonto();
+                        Console.WriteLine($"Monto total: ${total:0.##}");
+                    }
+                    else if (p is Recurrente r)
+                    {
+                        double total = r.CalcularMonto();
+                        Console.WriteLine($"Monto total: ${total:0.##}");
+
+                        if (r.FechaFin == DateTime.MaxValue)
+                        {
+                            Console.WriteLine("Recurrente sin fecha de fin");
+                        }
+                        else if (r.FechaFin < DateTime.Today)
+                        {
+                            Console.WriteLine("Finalizado");
+                        }
+                        else
+                        {
+                            Console.WriteLine($"Fecha fin: {r.FechaFin.ToShortDateString()}");
+                        }
+                    }
+
+                    Console.WriteLine("-----------------------------------------------------");
+                }
+            }
+
+            if (!encontro)
+            {
+                Console.WriteLine("No se encontraron pagos para ese usuario.");
+            }
+        }
+
+        private static void AltaUsuario()
+        {
+            Console.Write("Nombre: ");
+            string nombre = Console.ReadLine();
+
+            Console.Write("Apellido: ");
+            string apellido = Console.ReadLine();
+
+            if (string.IsNullOrWhiteSpace(nombre) || string.IsNullOrWhiteSpace(apellido))
+            {
+                Console.WriteLine("El nombre y/o el apellido no pueden estar vacíos.");
+                return;
+            }
+
+            Console.Write("Contraseña: ");
+            string contrasenia = Console.ReadLine();
+
+            if (string.IsNullOrEmpty(contrasenia) || contrasenia.Length < 8)
+            {
+                Console.WriteLine("La contraseña debe tener al menos 8 caracteres.");
+                return;
+            }
+
+            Console.WriteLine("\nEquipos:");
+            for (int i = 0; i < sistema.Equipos.Count; i++)
+            {
+                Console.WriteLine($"{i + 1}. {sistema.Equipos[i].NombreEquipo}");
+            }
+
+            Console.Write("Seleccione el número del equipo: ");
+            int indiceEquipo;
+            while (!int.TryParse(Console.ReadLine(), out indiceEquipo) ||
+                   indiceEquipo < 1 || indiceEquipo > sistema.Equipos.Count)
+            {
+                Console.Write("Número inválido. Intente nuevamente: ");
+            }
+
+            Equipo equipoSeleccionado = sistema.Equipos[indiceEquipo - 1];
+
+            Console.Write("Fecha de incorporación (dd/mm/aaaa): ");
+            DateTime fechaIncorporacion;
+            while (!DateTime.TryParse(Console.ReadLine(), out fechaIncorporacion))
+            {
+                Console.Write("Formato incorrecto. Ingrese la fecha nuevamente (dd/mm/aaaa): ");
+            }
+
+            sistema.CrearUsuario(nombre, apellido, contrasenia, equipoSeleccionado, fechaIncorporacion);
+            Console.WriteLine("\nUsuario creado correctamente.");
+        }
+
+        private static void MostrarUsuariosPorEquipo()
+        {
+            Console.WriteLine("Equipos:");
+            for (int i = 0; i < sistema.Equipos.Count; i++)
+            {
+                Console.WriteLine($"{i + 1}. {sistema.Equipos[i].NombreEquipo}");
+            }
+
+            Console.Write("Seleccione el número del equipo: ");
+            int indice;
+            while (!int.TryParse(Console.ReadLine(), out indice) ||
+                   indice < 1 || indice > sistema.Equipos.Count)
+            {
+                Console.Write("Número inválido. Intente nuevamente: ");
+            }
+
+            Equipo equipoSeleccionado = sistema.Equipos[indice - 1];
+
+            Console.WriteLine($"\nUsuarios del equipo {equipoSeleccionado.NombreEquipo}:\n");
+
+            bool hayUsuarios = false;
+
+            foreach (Usuario u in sistema.Usuarios)
+            {
+                if (u.Equipo == equipoSeleccionado)
+                {
+                    hayUsuarios = true;
+                    Console.WriteLine($"Nombre: {u.Nombre} {u.Apellido} | Email: {u.Email}");
+                }
+            }
+
+            if (!hayUsuarios)
+            {
+                Console.WriteLine("No hay usuarios en ese equipo.");
+            }
+
+            Console.WriteLine();
+        }
     }
 }
-
