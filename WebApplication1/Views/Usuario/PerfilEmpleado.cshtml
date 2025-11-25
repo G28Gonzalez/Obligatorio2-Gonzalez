@@ -1,0 +1,41 @@
+﻿@using Dominio
+
+@{
+    ViewData["Title"] = "Perfil";
+
+    Usuario usuario = (Usuario)ViewBag.Usuario;
+    double totalMes = (double)ViewBag.TotalMes;
+}
+
+<h1>Perfil del empleado</h1>
+
+<h3>Datos personales</h3>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Rol</th>
+            <th>Nombre y Apellido</th>
+            <th>Email</th>
+            <th>Fecha Incorporación</th>
+            <th>Equipo</th>
+            <th>Total gastado este mes</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>@usuario.Rol()</td>
+            <td>@usuario.Nombre @usuario.Apellido</td>
+            <td>@usuario.Email</td>
+            <td>@usuario.FechaIncorporacion.ToShortDateString()</td>
+            <td>@usuario.Equipo.NombreEquipo</td>
+            <td>$ @totalMes</td>
+        </tr>
+    </tbody>
+</table>
+
+<p>
+    <a class="btn btn-outline-primary" asp-controller="Usuario" asp-action="VerPagos">
+        Ver pagos del mes
+    </a>
+</p>

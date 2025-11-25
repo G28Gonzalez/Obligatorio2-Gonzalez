@@ -1,0 +1,69 @@
+﻿@using Dominio
+
+@{
+    ViewData["Title"] = "Perfil Gerente";
+
+    Gerente gerente = (Gerente)ViewBag.Gerente;
+    double totalMes = (double)ViewBag.TotalMes;
+    List<Usuario> miembros = (List<Usuario>)ViewBag.Miembros;
+}
+
+<h1>Perfil del gerente</h1>
+
+<h3>Datos personales</h3>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Rol</th>
+            <th>Nombre y Apellido</th>
+            <th>Email</th>
+            <th>Fecha de incorporación</th>
+            <th>Equipo</th>
+            <th>Total gastado este mes</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>@gerente.Rol()</td>  @* Gerente override Rol() *@
+            <td>@gerente.Nombre @gerente.Apellido</td>
+            <td>@gerente.Email</td>
+            <td>@gerente.FechaIncorporacion.ToShortDateString()</td>
+            <td>@gerente.Equipo.NombreEquipo</td>
+            <td>$ @totalMes</td>
+        </tr>
+    </tbody>
+</table>
+
+<h3>Miembros del equipo (@gerente.Equipo.NombreEquipo)</h3>
+
+@if (miembros == null || miembros.Count == 0)
+{
+    <p>No hay miembros registrados en este equipo.</p>
+}
+else
+{
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Rol</th>
+                <th>Nombre</th>
+                <th>Apellido</th>
+                <th>Email</th>
+                <th>Fecha incorporación</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (Usuario u in miembros)
+            {
+                <tr>
+                    <td>@u.Rol()</td>  @* Empleado o Gerente (si quisieras incluir otros) *@
+                    <td>@u.Nombre</td>
+                    <td>@u.Apellido</td>
+                    <td>@u.Email</td>
+                    <td>@u.FechaIncorporacion.ToShortDateString()</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

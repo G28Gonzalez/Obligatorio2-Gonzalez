@@ -1,0 +1,97 @@
+﻿@using Dominio
+
+@{
+    ViewData["Title"] = "Pagos del equipo";
+
+    List<Pago> pagos = (List<Pago>)ViewBag.Pagos;
+    int mes = (int)ViewBag.Mes;
+    int anio = (int)ViewBag.Anio;
+    double totalBase = (double)ViewBag.TotalBase;
+    double totalConBeneficios = (double)ViewBag.TotalConBeneficios;
+}
+
+<h1>Pagos del equipo</h1>
+
+<form asp-controller="Gerente" asp-action="VerPagosEquipo" method="get" class="row g-3 mb-3">
+    <div class="col-auto">
+        <label class="form-label">Mes</label>
+        <input type="number" class="form-control" name="mes" min="1" max="12" value="@mes" />
+    </div>
+    <div class="col-auto">
+        <label class="form-label">Año</label>
+        <input type="number" class="form-control" name="anio" value="@anio" />
+    </div>
+    <div class="col-auto align-self-end">
+        <button type="submit" class="btn btn-primary">Filtrar</button>
+    </div>
+</form>
+
+<p>
+    <strong>Total base (sumando Monto):</strong> $ @totalBase <br />
+    <strong>Total con beneficios/recargos:</strong> $ @totalConBeneficios
+</p>
+
+@if (pagos == null || pagos.Count == 0)
+{
+    <p>No hay pagos para el período seleccionado.</p>
+}
+else
+{
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Empleado</th>
+                <th>Descripción</th>
+                <th>Método</th>
+                <th>Tipo</th>
+                <th>Fecha</th>
+                <th>Fecha fin</th>
+                <th>Monto base</th>
+                <th>Monto con beneficios</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (Pago pago in pagos)
+            {
+                string tipo = pago is Recurrente ? "Recurrente" : "Único";
+                DateTime fecha;
+                string fechaFinTexto = "-";
+                double montoBase = pago.Monto;
+                double montoConBeneficios;
+
+                if (pago is Unico u)
+                {
+                    fecha = u.FechaPago;
+                    montoConBeneficios = u.CalcularMonto();
+                }
+                else if (pago is Recurrente r)
+                {
+                    fecha = r.FechaInicio;
+
+                    if (r.FechaFin == DateTime.MaxValue)
+                        fechaFinTexto = "Sin fecha fin";
+                    else
+                        fechaFinTexto = r.FechaFin.ToShortDateString();
+
+                    montoConBeneficios = r.CalcularMonto();
+                }
+                else
+                {
+                    fecha = DateTime.MinValue;
+                    montoConBeneficios = pago.Monto;
+                }
+
+                <tr>
+                    <td>@pago.UsuarioQueRealizo.Nombre @pago.UsuarioQueRealizo.Apellido</td>
+                    <td>@pago.Descripcion</td>
+                    <td>@pago.MetodoDePago</td>
+                    <td>@tipo</td>
+                    <td>@(fecha == DateTime.MinValue ? "-" : fecha.ToShortDateString())</td>
+                    <td>@fechaFinTexto</td>
+                    <td>$ @montoBase</td>
+                    <td>$ @montoConBeneficios</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

@@ -1,0 +1,61 @@
+﻿@using Dominio
+
+@{
+    ViewData["Title"] = "Ver Pagos";
+
+    List<Pago> pagos = (List<Pago>)ViewBag.Pagos;
+}
+
+<h1>Pagos cargados este mes</h1>
+
+@if (pagos == null || pagos.Count == 0)
+{
+    <p>No hay pagos cargados este mes.</p>
+}
+else
+{
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>ID Pago</th>
+                <th>Descripción</th>
+                <th>Método de pago</th>
+                <th>Tipo</th>
+                <th>Fecha</th>
+                <th>Fecha fin</th>
+                <th>Monto</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (Pago pago in pagos)
+            {
+                string tipo = pago is Recurrente ? "Recurrente" : "Único";
+                DateTime fecha;
+                string fechaFinTexto = "-";
+
+                if (pago is Unico u)
+                {
+                    fecha = u.FechaPago;
+                }
+                else if (pago is Recurrente r)
+                {
+                    fecha = r.FechaInicio;
+                    fechaFinTexto = r.FechaFin == DateTime.MaxValue
+                    ? "Sin fecha fin"
+                    : r.FechaFin.ToShortDateString();
+                }
+                else fecha = DateTime.MinValue;
+
+                <tr>
+                    <td>@pago.TipoGasto.Nombre</td>
+                    <td>@pago.Descripcion</td>
+                    <td>@pago.MetodoDePago</td>
+                    <td>@tipo</td>
+                    <td>@fecha.ToShortDateString()</td>
+                    <td>@fechaFinTexto</td>
+                    <td>$ @pago.Monto</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

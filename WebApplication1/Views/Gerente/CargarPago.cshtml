@@ -1,0 +1,95 @@
+﻿@using Dominio
+
+@{
+    ViewData["Title"] = "Cargar Pago (Gerente)";
+    var gastos = (List<TipoGasto>)ViewBag.Gastos;
+    var metodos = (Array)ViewBag.Metodos;
+}
+
+<h1>Cargar nuevo pago (Gerente)</h1>
+
+@if (ViewBag.Error != null)
+{
+    <div class="alert alert-danger">@ViewBag.Error</div>
+}
+
+<form asp-controller="Gerente" asp-action="CargarPago" method="post">
+
+    <!-- TIPO DE PAGO -->
+    <div class="mb-3">
+        <label class="form-label">Tipo de pago</label>
+        <select class="form-select" id="tipoPago" name="tipoPago" required>
+            <option value="">Seleccione...</option>
+            <option value="U">Único</option>
+            <option value="R">Recurrente</option>
+        </select>
+    </div>
+
+    <!-- TIPO DE GASTO -->
+    <div class="mb-3">
+        <label class="form-label">Tipo de gasto</label>
+        <select class="form-select" name="gastoNombre" required>
+            <option value="">Seleccione un gasto...</option>
+            @foreach (var g in gastos)
+            {
+                <option value="@g.Nombre">@g.Nombre</option>
+            }
+        </select>
+    </div>
+
+    <!-- MÉTODO DE PAGO -->
+    <div class="mb-3">
+        <label class="form-label">Método de pago</label>
+        <select class="form-select" name="metodo" required>
+            @foreach (var m in metodos)
+            {
+                <option value="@m">@m</option>
+            }
+        </select>
+    </div>
+
+    <!-- MONTO -->
+    <div class="mb-3">
+        <label class="form-label">Monto</label>
+        <input class="form-control" name="monto" type="number" min="1" step="1" required />
+    </div>
+
+    <!-- CAMPOS PARA ÚNICO -->
+    <div id="pagoUnicoDiv" class="mb-3" style="display:none;">
+        <label class="form-label">Fecha de pago</label>
+        <input class="form-control" name="fechaUnico" type="date" />
+    </div>
+
+    <!-- CAMPOS PARA RECURRENTE -->
+    <div id="pagoRecDiv" style="display:none;">
+        <div class="mb-3">
+            <label class="form-label">Fecha inicio</label>
+            <input class="form-control" name="fechaInicio" type="date" />
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Fecha fin (opcional)</label>
+            <input class="form-control" name="fechaFin" type="date" />
+        </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Guardar pago</button>
+</form>
+
+<script>
+    const tipoPago = document.getElementById("tipoPago");
+    const pagoUnicoDiv = document.getElementById("pagoUnicoDiv");
+    const pagoRecDiv = document.getElementById("pagoRecDiv");
+
+    tipoPago.addEventListener("change", function () {
+        if (this.value === "U") {
+            pagoUnicoDiv.style.display = "block";
+            pagoRecDiv.style.display = "none";
+        } else if (this.value === "R") {
+            pagoUnicoDiv.style.display = "none";
+            pagoRecDiv.style.display = "block";
+        } else {
+            pagoUnicoDiv.style.display = "none";
+            pagoRecDiv.style.display = "none";
+        }
+    });
+</script>
